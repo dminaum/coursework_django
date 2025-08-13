@@ -17,13 +17,13 @@
 <body>
 <header>
     <nav>
-        {% if user.is_authenticated %}
-            <a href="{% url 'home' %}">Главная</a>
-            <a href="{% url 'mailings:client_list' %}">Клиенты</a>
-            <a href="{% url 'mailings:mailing_list' %}">Рассылки</a>
-            <a href="{% url 'mailings:message_list' %}">Письма</a>
-            <a href="{% url 'mailings:attempt_list' %}">Попытки</a>
-        {% endif %}
+        <a href="{% url 'home' %}">Главная</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'mailings:client_list' %}">Клиенты</a>
+                <a href="{% url 'mailings:mailing_list' %}">Рассылки</a>
+                <a href="{% url 'mailings:message_list' %}">Письма</a>
+                <a href="{% url 'mailings:attempt_list' %}">Попытки</a>
+            {% endif %}
     </nav>
 
     <div class="auth">
