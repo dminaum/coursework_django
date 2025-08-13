@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Попытка №{{ attempt.id }}</h1>
+
+<p><strong>Дата:</strong> {{ attempt.date|date:"Y-m-d H:i" }}</p>
+<p><strong>Статус:</strong> {{ attempt.get_status_display }}</p>
+<p><strong>Ответ сервера:</strong></p>
+<pre>{{ attempt.reply }}</pre>
+
+<p>
+    <strong>Связанная рассылка:</strong>
+    <a href="{% url 'mailings:mailing_detail' pk=attempt.mailing.pk %}">
+        Рассылка №{{ attempt.mailing.pk }}
+    </a>
+</p>
+
+<a href="{% url 'mailings:attempt_list' %}">← Назад к списку</a>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Главная — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Сервис рассылок</h1>
+
+<h2>Статистика</h2>
+<ul>
+    <li>Всего рассылок: {{ total_mailings }}</li>
+    <li>Активных рассылок: {{ active_mailings }}</li>
+    <li>Уникальных получателей: {{ unique_clients }}</li>
+</ul>
+
+<h2>Разделы</h2>
+<ul>
+    <li><a href="{% url 'mailings:client_list' %}">Клиенты</a></li>
+    <li><a href="{% url 'mailings:mailing_list' %}">Рассылки</a></li>
+    <li><a href="{% url 'mailings:attempt_list' %}">Попытки отправки</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Рассылки — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Рассылки</h1>
+
+<p><a href="{% url 'mailings:mailing_create' %}">+ Создать рассылку</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Статус</th>
+      <th>Начало</th>
+      <th>Окончание</th>
+      <th>Сообщение</th>
+      <th>Получателей</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in mailings %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.get_status_display }}</td>
+        <td>{{ m.start_time|date:"Y-m-d H:i" }}</td>
+        <td>{{ m.end_time|date:"Y-m-d H:i" }}</td>
+        <td>{{ m.message.topic }}</td>
+        <td>{{ m.clients.count }}</td>
+        <td><a href="{% url 'mailings:mailing_detail' m.id %}">Открыть</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7">Рассылок пока нет</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

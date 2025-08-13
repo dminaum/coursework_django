@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Список попыток</h1>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Статус</th>
+        <th>Ответ сервера</th>
+        <th>Рассылка</th>
+        <th>Действия</th>
+    </tr>
+    {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.id }}</td>
+            <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
+            <td>{{ attempt.get_status_display }}</td>
+            <td>{{ attempt.reply  }}</td>
+            <td>№{{ attempt.mailing.id }}</td>
+            <td>
+                <a href="{{ attempt.get_absolute_url }}">Подробнее</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="5">Нет попыток</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+

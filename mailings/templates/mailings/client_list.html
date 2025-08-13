@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Клиенты — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Клиенты</h1>
+
+<p>
+  <a href="{% url 'mailings:client_create' %}">+ Создать клиента</a>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Почта</th>
+      <th>Ф. И. О.</th>
+      <th>Комментарий</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for client in clients %}
+      <tr>
+        <td>{{ client.id }}</td>
+        <td>{{ client.email }}</td>
+        <td>{{ client.full_name }}</td>
+        <td>{{ client.comment|default:"—" }}</td>
+        <td>
+          <a href="{% url 'mailings:client_detail' client.id %}">Открыть</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5">Клиентов пока нет</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <p>
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+    {% endif %}
+    Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
+    {% endif %}
+  </p>
+{% endif %}
+{% endblock %}

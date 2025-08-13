@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ view.object|yesno:"Изменить клиента,Создать клиента" }} — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>{{ view.object|yesno:"Изменить клиента,Создать клиента" }}</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <table>
+    {{ form.as_table }}
+  </table>
+  <p>
+    <button type="submit">Сохранить</button>
+    <a href="{% if view.object %}{% url 'mailings:client_detail' view.object.id %}{% else %}{% url 'mailings:client_list' %}{% endif %}">Отмена</a>
+  </p>
+</form>
+{% endblock %}

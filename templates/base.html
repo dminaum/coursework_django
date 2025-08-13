@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Сервис рассылок{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        header { margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center; }
+        nav a { margin-right: 10px; }
+        table { border-collapse: collapse; width: 100%; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 8px; text-align: left; }
+        h1, h2, h3 { margin-top: 0; }
+        .auth a { margin-left: 10px; }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}">Главная</a>
+            <a href="{% url 'mailings:client_list' %}">Клиенты</a>
+            <a href="{% url 'mailings:mailing_list' %}">Рассылки</a>
+            <a href="{% url 'mailings:message_list' %}">Письма</a>
+            <a href="{% url 'mailings:attempt_list' %}">Попытки</a>
+        {% endif %}
+    </nav>
+
+    <div class="auth">
+        {% if user.is_authenticated %}
+            <a href="{% url 'users:profile' %}">Профиль</a>
+            <a href="{% url 'mailings:stats' %}">Статистика</a>
+            <span>Вы вошли как: {{ user.get_username }}</span>
+            <a href="{% url 'users:logout' %}">Выход</a>
+        {% else %}
+            <a href="{% url 'users:login' %}">Вход</a>
+            <a href="{% url 'users:signup' %}">Регистрация</a>
+        {% endif %}
+    </div>
+</header>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% block content %}{% endblock %}
+</body>
+</html>

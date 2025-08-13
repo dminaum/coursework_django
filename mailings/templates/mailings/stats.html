@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Моя статистика — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Статистика</h1>
+
+<ul>
+  <li>Всего рассылок: <strong>{{ total_mailings }}</strong></li>
+  <li>Активных рассылок: <strong>{{ active_mailings }}</strong></li>
+  <li>Уникальных получателей: <strong>{{ unique_clients }}</strong></li>
+</ul>
+
+<h2>Мои рассылки</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Тема</th>
+      <th>Клиентов</th>
+      <th>Успешно</th>
+      <th>Неуспешно</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in mailings_with_stats %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.message.topic }}</td>
+        <td>{{ m.clients_count }}</td>
+        <td>{{ m.success_count }}</td>
+        <td>{{ m.fail_count }}</td>
+        <td><a href="{% url 'mailings:mailing_detail' m.id %}">Открыть</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6">Нет рассылок</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Рассылка №{{ mailing.id }} — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Рассылка №{{ mailing.id }}</h1>
+
+<p><strong>Статус:</strong> {{ mailing.get_status_display }}</p>
+<p><strong>Период:</strong> {{ mailing.start_time|date:"Y-m-d H:i" }} — {{ mailing.end_time|date:"Y-m-d H:i" }}</p>
+
+<h3>Сообщение</h3>
+<p><strong>Тема:</strong> {{ mailing.message.topic }}</p>
+<pre style="white-space: pre-wrap; margin: 0;">{{ mailing.message.body }}</pre>
+
+<h3>Получатели ({{ mailing.clients.count }})</h3>
+<ul>
+  {% for c in mailing.clients.all %}
+    <li>{{ c.full_name }} — {{ c.email }}</li>
+  {% empty %}
+    <li>Получателей нет</li>
+  {% endfor %}
+</ul>
+
+<p>
+  <a href="{% url 'mailings:mailing_update' mailing.id %}">Изменить</a> |
+  <a href="{% url 'mailings:mailing_delete' mailing.id %}">Удалить</a>
+</p>
+
+<h3>Действия</h3>
+<form method="post" action="{% url 'mailings:mailing_send' mailing.id %}" style="display:inline-block;">
+  {% csrf_token %}
+  <button type="submit">Отправить сейчас</button>
+</form>
+
+<h3>Попытки</h3>
+<table>
+  <tr><th>Дата</th><th>Статус</th><th>Ответ сервера</th></tr>
+  {% for a in mailing.attempts.all %}
+    <tr>
+      <td>{{ a.date|date:"Y-m-d H:i" }}</td>
+      <td>{{ a.get_status_display }}</td>
+      <td><pre style="white-space: pre-wrap; margin: 0;">{{ a.reply|default:"—" }}</pre></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="3">Попыток пока нет</td></tr>
+  {% endfor %}
+</table>
+
+<p><a href="{% url 'mailings:mailing_list' %}">← К списку рассылок</a></p>
+{% endblock %}

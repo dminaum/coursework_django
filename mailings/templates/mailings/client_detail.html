@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Клиент #{{ client.id }} — Сервис рассылок{% endblock %}
+
+{% block content %}
+<h1>Клиент #{{ client.id }}</h1>
+
+<p><strong>Почта:</strong> {{ client.email }}</p>
+<p><strong>Ф. И. О.:</strong> {{ client.full_name }}</p>
+<p><strong>Комментарий:</strong><br> {{ client.comment|linebreaksbr|default:"—" }}</p>
+
+<p>
+  <a href="{% url 'mailings:client_update' client.id %}">Изменить</a> |
+  <a href="{% url 'mailings:client_delete' client.id %}">Удалить</a> |
+  <a href="{% url 'mailings:client_list' %}">← К списку</a>
+</p>
+{% endblock %}
