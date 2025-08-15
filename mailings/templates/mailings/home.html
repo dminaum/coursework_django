@@ -13,8 +13,10 @@
 
 <h2>Разделы</h2>
 <ul>
-    <li><a href="{% url 'mailings:client_list' %}">Клиенты</a></li>
-    <li><a href="{% url 'mailings:mailing_list' %}">Рассылки</a></li>
-    <li><a href="{% url 'mailings:attempt_list' %}">Попытки отправки</a></li>
+    {% if user.is_authenticated %}
+        <li><a href="{% url 'mailings:client_list' %}">Клиенты</a></li>
+        <li><a href="{% url 'mailings:mailing_list' %}">Рассылки</a></li>
+        <li><a href="{% url 'mailings:attempt_list' %}">Попытки отправки</a></li>
+    {% endif %}
 </ul>
 {% endblock %}
