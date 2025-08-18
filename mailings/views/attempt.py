@@ -4,11 +4,24 @@ from ..models import Attempt
 
 
 class AttemptView(LoginRequiredMixin, ListView):
+    """Список попыток отправки сообщений.
+
+    Отображает все попытки рассылок с возможностью фильтрации
+    по пользователю, рассылке и статусу.
+    """
     model = Attempt
     template_name = 'mailings/attempts_list.html'
     context_object_name = 'attempts'
 
     def get_queryset(self):
+        """Возвращает выборку попыток с фильтрацией.
+
+        - Если у пользователя есть право 'view_all_attempts',
+          возвращаются все попытки.
+        - Иначе — только попытки рассылок текущего пользователя.
+        - Дополнительно можно фильтровать по ID рассылки (pk)
+          и по статусу (успешно/неуспешно).
+        """
         qs = (Attempt.objects
               .select_related('mailing')
               .order_by('-date'))
@@ -25,17 +38,25 @@ class AttemptView(LoginRequiredMixin, ListView):
 
 
 class AttemptDetailView(LoginRequiredMixin, DetailView):
+    """Детальная информация о попытке отправки."""
     model = Attempt
     template_name = 'mailings/attempt_detail.html'
     context_object_name = 'attempt'
 
     def get_queryset(self):
+        """Возвращает выборку попыток с учётом прав доступа.
+
+        - Если у пользователя есть право 'view_all_attempts',
+          возвращаются все попытки.
+        - Иначе — только попытки рассылок текущего пользователя.
+        """
         qs = super().get_queryset().select_related('mailing')
         if self.request.user.has_perm('mailings.view_all_attempts'):
             return qs
         return qs.filter(mailing__owner=self.request.user)
 
     def get_context_data(self, **kwargs):
+        """Добавляет в контекст человекочитаемое название статуса."""
         ctx = super().get_context_data(**kwargs)
         ctx["status_display"] = self.object.get_status_display()
         return ctx

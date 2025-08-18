@@ -4,6 +4,20 @@ from .models import Attempt, Mailing
 
 
 def send_mailing_now(mailing: Mailing) -> dict:
+    """Выполняет немедленную отправку выбранной рассылки.
+
+    Для каждого клиента рассылки отправляется письмо и фиксируется результат
+    (успех или ошибка) в модели Attempt.
+
+    Аргументы:
+        mailing (Mailing): объект рассылки, который нужно отправить.
+
+    Возвращает:
+        dict: словарь со статистикой отправки:
+            - total (int): общее количество попыток отправки,
+            - ok (int): количество успешных отправок,
+            - failed (int): количество неуспешных отправок.
+    """
     mailing.refresh_from_db()
     stats = {"total": 0, "ok": 0, "failed": 0}
 
@@ -51,7 +65,6 @@ def send_mailing_now(mailing: Mailing) -> dict:
             )
             stats["failed"] += 1
 
-    # пометим завершение
     mailing.status = Mailing.Status.FINISHED
     mailing.save(update_fields=["status"])
 

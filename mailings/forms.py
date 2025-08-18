@@ -4,6 +4,10 @@ from django.core.exceptions import ValidationError
 
 
 class ClientForm(forms.ModelForm):
+    """Форма для создания и редактирования клиентов.
+
+    Переопределяет валидацию email для нормализации (строчные буквы).
+    """
     class Meta:
         model = Client
         fields = ['email', 'full_name', 'comment']
@@ -13,12 +17,17 @@ class ClientForm(forms.ModelForm):
 
 
 class MessageForm(forms.ModelForm):
+    """Форма для создания и редактирования сообщений рассылки."""
     class Meta:
         model = Message
         fields = ['topic', 'body']
 
 
 class MailingForm(forms.ModelForm):
+    """Форма для создания и редактирования рассылок.
+
+    Валидирует корректность дат (начало < конец).
+    """
     start_time = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )

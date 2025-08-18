@@ -7,6 +7,11 @@ from config import settings
 
 
 class Client(models.Model):
+    """Модель клиента для рассылок.
+
+    Хранит email-адрес, имя и комментарий к клиенту.
+    Используется для формирования списка получателей рассылки.
+    """
     email = models.EmailField(verbose_name='Почта')
     full_name = models.CharField(max_length=150, verbose_name='Ф. И. О.')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
@@ -33,6 +38,10 @@ class Client(models.Model):
 
 
 class Message(models.Model):
+    """Модель сообщения.
+
+    Содержит тему и текст письма, которое будет отправлено клиентам.
+    """
     topic = models.CharField(max_length=150, verbose_name='Тема письма')
     body = models.TextField(verbose_name='Текст письма')
     owner = models.ForeignKey(
@@ -55,6 +64,11 @@ class Message(models.Model):
 
 
 class Mailing(models.Model):
+    """Модель рассылки.
+
+    Определяет периодичность, дату начала и окончания,
+    а также связанные сообщение и список клиентов.
+    """
     class Status(models.TextChoices):
         CREATED = 'created', 'Создана'
         RUNNING = 'running', 'Запущена'
@@ -101,6 +115,11 @@ class Mailing(models.Model):
 
 
 class Attempt(models.Model):
+    """Модель попытки отправки сообщения.
+
+    Фиксирует время отправки, статус (успех/ошибка)
+    и ответ почтового сервера.
+    """
     class Status(models.TextChoices):
         SUCCEEDED = 'succeeded', 'Успешно'
         FAILED = 'failed', 'Не успешно'
