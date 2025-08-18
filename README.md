@@ -1,124 +1,135 @@
-readme_content = r"""Сервис рассылок (Django)
+# Mailing Service (Django coursework)
 
-Учебный проект по ТЗ: CRUD рассылок, клиентов и сообщений; лог попыток отправки; аутентификация с подтверждением email; профиль пользователя; роли (пользователь/менеджер); статистика; серверное и клиентское кеширование.
+Проект учебного сервиса массовых рассылок на Django: клиенты, сообщения, рассылки, попытки отправки, статистика, аутентификация.
 
-──────────────────────────────────────────────────────────────────────────────
+## Стек
 
-Технологии
-- Python 3.12
-- Django 5.2.5
-- PostgreSQL
-- Redis (для кэша, опционально — можно LocMem)
+- Python 3.12+
+- Django 5.2
+- PostgreSQL 15+
+- Redis
 - python-dotenv
-- Pillow (аватарки пользователей)
+- Pillow
 
-──────────────────────────────────────────────────────────────────────────────
+## Быстрый старт (локально)
 
-Возможности
-- Клиенты/Сообщения/Рассылки — полный CRUD.
-- Попытки рассылки (Attempt): дата/время, статус (Успешно/Неуспешно), ответ почтового сервера.
-- Отправка рассылки “Сейчас” из интерфейса и через управленческую команду.
-- Главная страница: количество всех рассылок, активных и уникальных получателей.
-- Регистрация с подтверждением email, вход/выход, восстановление пароля.
-- Профиль пользователя: просмотр и редактирование (email редактировать нельзя).
-- Права доступа:
-  - Пользователь — видит и управляет только своими объектами.
-  - Менеджер — видит все объекты, но не редактирует чужие; может видеть список пользователей (по правам).
-- Статистика: успешные/неуспешные попытки по рассылкам пользователя (аннотации).
-- Кеширование: главная/статистика (micro-cache), безопасно для персональных страниц.
+1) Клонируйте репозиторий и перейдите в каталог проекта.
 
-──────────────────────────────────────────────────────────────────────────────
+```bash
+git clone <url> django_coursework
+cd django_coursework
+```
 
-Быстрый старт (локально)
-1) Клонируйте репозиторий и установите зависимости:
-   python -m venv .venv
-   . .venv/Scripts/activate          # Windows PowerShell: .venv\Scripts\Activate.ps1
-   pip install -r requirements.txt
+2) Создайте и активируйте виртуальное окружение, установите зависимости:
 
-2) Переменные окружения:
-   Скопируйте .env.template → .env и заполните значениями:
-     SECRET_KEY=...
-     DEBUG=True
-     DB_NAME=...
-     DB_USER=...
-     DB_PASSWORD=...
-     DB_HOST=localhost
-     DB_PORT=5432
-     EMAIL_HOST=smtp.example.com
-     EMAIL_PORT=587
-     EMAIL_USE_TLS=True
-     EMAIL_HOST_USER=you@example.com
-     EMAIL_HOST_PASSWORD=app_password
-     DEFAULT_FROM_EMAIL=you@example.com
-     REDIS_URL=redis://127.0.0.1:6379/1   # если используете Redis
+```bash
+python -m venv .venv
+. .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -U pip
+pip install -r requirements.txt  # если используете pip
+# или через Poetry:
+# pip install poetry
+# poetry install
+```
 
-3) База и миграции:
-   python manage.py migrate
-   python manage.py createsuperuser
+3) Создайте файл `.env` (можно на основе `.env.template`) и заполните переменные окружения:
 
-4) (Опционально) Redis для кэша:
-   # Docker
-   docker run -d --name redis -p 6379:6379 --restart unless-stopped redis:7 redis-server --save 60 1 --loglevel warning
-   # Проверка: docker exec -it redis redis-cli ping  → PONG
+```bash
+cp .env.template .env
+```
 
-   В settings.py укажите один из вариантов кэша:
-   - Redis:
-       CACHES = {
-         "default": {
-           "BACKEND": "django.core.cache.backends.redis.RedisCache",
-           "LOCATION": "redis://127.0.0.1:6379/1",
-         }
-       }
-   - Локальный (без Redis):
-       CACHES = {
-         "default": {
-           "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-           "LOCATION": "mailings-cache",
-         }
-       }
+Обязательные переменные:
 
-5) Создать группу «Менеджеры» и выдать права (однократно):
-   python manage.py bootstrap_managers
+- `SECRET_KEY` — секретный ключ Django.
+- `DEBUG` — `True/False`.
+- База данных: `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`.
+- Почта: `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` (пароль приложения).
+- **Redis:** `REDIS_URL` — адрес Redis, например:  
+  `redis://localhost:6379/1`
 
-6) Запуск сервера:
-   python manage.py runserver
-   Откройте http://127.0.0.1:8000/
+Пример `.env`:
 
-──────────────────────────────────────────────────────────────────────────────
+```bash
+SECRET_KEY=dev-secret
+DEBUG=True
+DB_NAME=mailings
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
+EMAIL_HOST_USER=example@yandex.ru
+EMAIL_HOST_PASSWORD=app-password
+REDIS_URL=redis://localhost:6379/1
+```
 
-Команды
-- Отправка рассылки по id:
-    python manage.py send_mailing <mailing_id>
+4) Примените миграции и создайте суперпользователя:
 
-- Создание группы «Менеджеры» с нужными правами:
-    python manage.py bootstrap_managers
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
 
-──────────────────────────────────────────────────────────────────────────────
+5) Запустите сервер разработки:
 
-Структура основных приложений
-- users
-  - Модель пользователя (AUTH_USER_MODEL), логин по email.
-  - Регистрация с email-подтверждением, вход/выход, восстановление пароля.
-  - Профиль: Detail/Update (email — только для чтения).
-- mailings
-  - Client, Message, Mailing, Attempt (связи по ТЗ).
-  - Поле owner у сущностей и фильтрация по владельцу во вьюхах.
-  - Права менеджера: view_all_clients / view_all_messages / view_all_mailings / view_all_attempts.
-  - Статистика: аннотации по попыткам (успех/неуспех), счётчики.
-  - Кеширование: HomeView (публичный micro-cache) и StatsView (пер-пользователь через vary_on_cookie + private).
+```bash
+python manage.py runserver
+```
 
-──────────────────────────────────────────────────────────────────────────────
+Откройте http://127.0.0.1:8000/
 
-Полезные заметки
-- Если после логина вы “как будто не авторизованы” на главной — причиной может быть публичный кэш.
-- Flake8:
-    [flake8]
-    max-line-length = 100
-    extend-ignore = E203, W503
-- requirements.txt должен содержать только используемые пакеты.
+## Настройка Redis в Django
 
-──────────────────────────────────────────────────────────────────────────────
+В `config/settings.py` замените «заглушку» на использование переменной окружения:
 
-Лицензия
-Учебный проект. Используйте свободно в образовательных целях.
-"""
+```python
+# config/settings.py (фрагмент)
+import os
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/1"),
+    }
+}
+```
+
+И обновите `.env` как показано выше.
+
+## Приложения и сущности
+
+- **users** — регистрация по email, вход, профиль.
+- **mailings** — клиенты, сообщения, рассылки, попытки, статистика.
+
+Ключевые модели:
+- `users.CustomUser` — пользователь с email-логином.
+- `mailings.Client` — клиент (email, ФИО, комментарий, владелец).
+- `mailings.Message` — текст письма (тема и тело, владелец).
+- `mailings.Mailing` — рассылка (получатели, сообщение, статусы, владелец).
+- `mailings.Attempt` — попытка отправки (дата, статус, ответ сервера).
+
+## Отправка рассылок
+
+Мгновенная отправка через кнопку в интерфейсе или через management-команду:
+
+```bash
+python manage.py send_mailing <mailing_id>
+```
+
+Команда использует `mailings.services.send_mailing_now`, который пишет записи в `Attempt` и считает статистику.
+
+## Роли и права
+
+Команда для инициализации группы «Менеджеры» и прав просмотра:
+
+```bash
+python manage.py bootstrap_managers
+```
+
+## Кэширование
+
+- Главная и статистика кэшируются через Redis.
+- Управляется декораторами `cache_page`, `cache_control`, `vary_on_cookie`.
+
+## Лицензия
+
+Skypro, курсач, август 2025

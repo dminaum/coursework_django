@@ -9,9 +9,20 @@ from django.views.decorators.vary import vary_on_cookie
 
 @method_decorator([vary_on_cookie, cache_control(private=True, max_age=60), cache_page(60)], name="dispatch")
 class StatsView(LoginRequiredMixin, TemplateView):
+    """Статистика пользователя по рассылкам.
+
+    Отображает:
+    - общее количество рассылок,
+    - количество активных рассылок,
+    - количество уникальных клиентов,
+    - детализированные данные по каждой рассылке:
+      число клиентов, успешных и неуспешных попыток.
+    Кэшируется на 60 секунд и учитывает cookies пользователя.
+    """
     template_name = "mailings/stats.html"
 
     def get_context_data(self, **kwargs):
+        """Формирует статистику для текущего пользователя."""
         ctx = super().get_context_data(**kwargs)
         u = self.request.user
 
